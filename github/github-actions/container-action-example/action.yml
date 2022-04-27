@@ -1,0 +1,14 @@
+name: 'my first container action'
+description: 'Amir Shkedys container action'
+author: 'Amir Shkedy'
+inputs:
+  myInput:
+    description: 'greeting to use'
+    required: true
+    default: 'Hello! I am nice!'
+outputs:
+  myOutput:
+    description: 'total memory'
+runs:
+  using: 'docker' # container action
+  image: 'Dockerfile' # Use the image in the Dockerfile

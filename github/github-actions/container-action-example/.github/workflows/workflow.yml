@@ -1,0 +1,17 @@
+on: [push] # Any push to any branch in the repository will triger this build to proceed
+
+jobs:
+  my-job:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v2 #checkout the repository and store it in a temporary data store accessed through the built-in variable GITHUB_WORKSPACES
+    - name: run the action
+      id: hello
+      uses: ./ # Will use the action.yml in the project directory, where .github directory is
+      with:
+        myInput: 'Amir Shkedy'
+    - name: output
+      run: |
+        echo ${{ steps.hello.outputs.memory }}
+        echo "total memory successfully output"
