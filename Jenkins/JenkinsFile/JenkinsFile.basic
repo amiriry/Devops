@@ -1,0 +1,26 @@
+pipeline {
+
+	agent amy
+
+		stage("build") {
+			
+			steps {
+				echo 'The stage of building the application'
+			}
+		}
+
+		stage("test") {
+			
+			steps {
+				echo 'This is where the application is tested'
+			}
+		}
+
+		stage("deploy") {
+			
+			steps {
+				echo 'The application is being deployed now'
+			}
+		}
+
+}
