@@ -1,0 +1,7 @@
+# ConfigMap must already be in the k8s cluster when referencing it
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mongo-configmap
+data:
+  database_url: mongo-service # database server url - the name of the service
