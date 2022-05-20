@@ -76,7 +76,7 @@ stages:
               artifactName: staticjs
 
   - stage: Build
-    condition: or(succeeded(), eq(variables['Build.Repository.Name'], 'arcus_api'))
+    condition: or(succeeded(), eq(variables['Build.Repository.Name'], 'repo2'))
     displayName: Build and push stage
     jobs:
       - job: Build
