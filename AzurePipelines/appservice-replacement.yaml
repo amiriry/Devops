@@ -1,0 +1,166 @@
+# Docker
+# Build and push an image to Azure Container Registry
+# https://docs.microsoft.com/azure/devops/pipelines/languages/docker
+
+pr:
+  branches:
+    include:
+      - staging
+    exclude:
+      - develop
+      - production
+
+resources:
+  repositories:
+    - repository: repo1
+      type: github
+      endpoint: endpoint1 # service connection that you create to be able to talk with github
+      name: name/repo2_name
+      trigger: true
+    - repository: repo2
+      type: github
+      endpoint: endpoint1 # service connection that you create to be able to talk with github
+      name: name/repo2_name
+      trigger: true
+  containers:
+    - container: container-name
+      image: container.registry/container-name
+      endpoint: ACR-endpoint # service connection that you create to be able to talk with ACR
+
+variables:
+- group: group-name # The variable group name that you can see in the ui - you expose it, so you can use the variables in it by hierarchy
+  # Container registry service connection established during pipeline creation
+- name: dockerRegistryServiceConnection
+  value: "<docker_registry_service_connection_value"
+- name: imageRepository
+  value: "<image_repo_name>"
+- name: containerRegistry
+  value: "<container_registry>"
+  #System.Debug: true
+
+stages:
+  - stage: Fetch
+    condition: eq(variables['Build.Repository.Name'], 'repo1')
+    displayName: Fetch, build and upload
+    jobs:
+      - job: Fetch
+        displayName: Fetch and Build
+        steps:
+          - checkout: repo1
+          - task: NodeTool@0
+            inputs:
+              versionSpec: '14.16.1'
+          - script: |
+             npm install
+            displayName: npm install
+          - task: DownloadSecureFile@1
+            name: securefile1
+            inputs:
+              secureFile: "file1.env"
+          - script: |
+             cp $(securefile1.secureFilePath) $(Build.SourcesDirectory)/.env
+          - script: |
+             npm run prod
+            displayName: npm run prod
+          - task: PublishPipelineArtifact@1
+            inputs:
+              targetPath: build/
+              artifactName: staticall
+          - task: PublishPipelineArtifact@1
+            inputs:
+              targetPath: build/static/css
+              artifactName: staticcss
+          - task: PublishPipelineArtifact@1
+            inputs:
+              targetPath: build/static/js
+              artifactName: staticjs
+
+  - stage: Build
+    condition: or(succeeded(), eq(variables['Build.Repository.Name'], 'arcus_api'))
+    displayName: Build and push stage
+    jobs:
+      - job: Build
+        displayName: Build
+        steps:
+          - checkout: repo2
+          - task: DownloadSecureFile@1
+            name: npmrc
+            inputs:
+              secureFile: ".npmrc"
+          - script: sudo cp $(npmrc.secureFilePath) $(Build.Repository.LocalPath)
+            displayName: Copy .npmrc file to working directory
+          - bash: |
+              sudo mkdir -p $(Build.Repository.LocalPath)/static/js #Create path for files if doesn't exit
+              sudo mkdir -p $(Build.Repository.LocalPath)/static/css
+              sudo chown -R vsts:vsts $(Build.Repository.LocalPath)
+            displayName: Create all needed directories
+          - task: DownloadPipelineArtifact@2
+            inputs:
+              source: current
+              artifact: staticcss
+              path: $(Build.Repository.LocalPath)/static/css
+            displayName: Download  staticcss artifact
+          - task: DownloadPipelineArtifact@2
+            inputs:
+              source: current
+              artifact: staticjs
+              path: $(Build.Repository.LocalPath)/static/js
+            displayName: Download staticjs artifact
+          - task: DownloadPipelineArtifact@2
+            inputs:
+              source: current
+              artifact: staticall
+              path: $(Build.Repository.LocalPath)/static/
+            displayName: Download  staticall artifact
+          - bash: | #DEBUG - see that everything is in place
+              echo $(Build.Repository.LocalPath)
+              ls $(Build.Repository.LocalPath)
+              echo
+              echo STATIC
+              ls $(Build.Repository.LocalPath)/static
+              echo
+              echo STATICCSS
+              ls $(Build.Repository.LocalPath)/static/css
+              echo
+              echo STATICJS
+              ls $(Build.Repository.LocalPath)/static/js
+            displayName: Content and path of all artifacts
+            continueOnError: true
+          - task: Docker@2
+            displayName: Build and push an image to container registry
+            inputs:
+              serviceConnection:
+              containerRegistry: "$(containerRegistry)" 
+              repository: "$(imageRepository)"
+              command: "buildAndPush"
+              Dockerfile: "**/Dockerfile"
+              tags: "my-container-image"
+            condition: succeededOrFailed()
+
+  - stage: Run
+    condition: succeeded()
+    displayName: Activate the App
+    jobs:
+      - job: StartAndConnect
+        displayName: Connect APPGW to container
+        steps:
+          - task: DownloadSecureFile@1
+            name: securefile3
+            inputs:
+              secureFile: securefile3.env"
+          - task: AzureCLI@2
+            displayName: Get container IP
+            inputs:
+              azureSubscription: azurerm-connection # Name of service connection to azure resources
+              scriptType: bash
+              scriptLocation: inlineScript
+              inlineScript: |
+                file1_envfile=$(securefile3.secureFilePath)
+                file2_pass=$(registrypass)
+                echo CREATING CONTAINER...
+                az container create -g my-resourcegroup --name my-container --image container.regostry/container-name:my-container-image --registry-username username --registry-password $registrypass --ip-address Private --location eastus --os-type Linux --command-line "/bin/bash -c 'az login --identity; npm run start-app'" --ports 443 --vnet myvnet --subnet ci-subnet --assign-identity "<some-identity>" --environment-variables $(cat $file1_envfile | xargs)
+                ACI_IP=$(az container show -g my-resourcegroup --name my-container --query ipAddress.ip -o tsv)
+                echo "info: $ACI_IP"
+                echo
+                echo CHAGING APPLICATION GATEWAY my-appgw BACKENDPOOL IP
+                az network application-gateway address-pool update -g my-resourcegroup --gateway-name my-appgw -n my-bp --servers $ACI_IP
