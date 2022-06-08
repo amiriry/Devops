@@ -1,6 +1,7 @@
 ## Jenkikns container - no need plugins instllation needed
 <br>
-##### When you want to check things on jenkins, specific plugin, or just plain old jenkins that have all the recommended plugins.<br>
+##### When you want to check things on jenkins, specific plugin, or just plain old jenkins that have all the recommended plugins.
+<br>
 
 commands to make it work:<br>
 `docker build -t <name>:<tag>`<br>
