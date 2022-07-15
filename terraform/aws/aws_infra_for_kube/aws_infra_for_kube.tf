@@ -1,11 +1,10 @@
 provider "aws" {
-	profile = "default"
 	region = var.region
 }
 
 resource "aws_key_pair" "mykp" {
 	key_name = "mykeypair"
-	public_key = file("mykey.pub")
+	public_key = file("/tmp/mytemp/aws/keys/mykey.pub")
 }
 
 resource "aws_security_group" "mysg" {
