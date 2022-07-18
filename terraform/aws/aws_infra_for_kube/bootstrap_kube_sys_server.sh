@@ -1,6 +1,6 @@
 #!/bin/bash
 # install ifconfig an stuff
-apt intsall net-tools
+apt install net-tools
 
 # install docker
 curl -fsSL https://download.docker.com/linux/ubuntu/gpg|apt-key add -
