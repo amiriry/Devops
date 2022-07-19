@@ -41,4 +41,11 @@ The command have the structure: <br />
 `<master_ip>` - The ip of the master <br />
 `<token>` - Token of one of the keys registered <br />
 `<discovery_token>` - The discovery token rely on the ca certificate of the master server <br />
-
+<br /><br />
+### To make everything work
+Up till now, all the construct exists, but doesn't work. If you'll execute `kubetl get nodes` you'll see that the are in NotReady state.<br />
+Whats left to do is to implement some networking solution.<br />
+In this case I use `calico` in line 30 in the server initiation script.<br>
+From the master do:<br />
+`kubectl apply -f calico.yaml`<br />
+You should see all nodes becoming Ready, one by one.
