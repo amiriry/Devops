@@ -16,6 +16,9 @@ apt-get update
 apt install -y kubelet kubeadm kubectl
 apt-mark hold kubelet kubeadm kubectl
 
+rm /etc/containerd/config.toml
+systemctl restart containerd  
+
 # add sysctl parameter for bridge networking
 echo "net.bridge.bridge-nf-call-iptables=1" >> /etc/sysctl.conf
 sysctl -p
