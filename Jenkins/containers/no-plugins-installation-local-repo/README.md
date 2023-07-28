@@ -2,7 +2,6 @@
 <br>
 
 #### When you want to check things on jenkins, and want to use local repository
-<br>
 I used that for jenkins container that have shared volume that contains all the jenkins code.<br>
 Can be used for any local mount that you want to do, for jenkins to use.<br>
 
