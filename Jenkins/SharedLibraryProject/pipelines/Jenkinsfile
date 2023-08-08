@@ -1,0 +1,14 @@
+node() {
+	echo "Loading local shared library"
+	def repoPath = sh(returnStdout: true, script: 'pwd').trim()
+	echo "repo path: $repoPath"
+	library identifier: 'SharedLibrary@master',
+			  retriever: modernSCM([$class: 'GitSCMSource', remote: "/var/sharedLib"]), 
+			  changelog: false
+	echo "doing basicStep:"
+	basicStep 'amir'
+	basicStep 'lilach'
+	readme 'check'
+	execme "nothing"
+	echo "Done loading the shared library"
+}

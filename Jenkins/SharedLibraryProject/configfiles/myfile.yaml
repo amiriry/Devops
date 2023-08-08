@@ -1,0 +1,9 @@
+field1:
+   field2:
+      field3: "somevalue"
+command:
+- exe: "touch file1"
+- exe: "touch file2"
+- exe: "ls -l"
+- exe: "pwd"
+
