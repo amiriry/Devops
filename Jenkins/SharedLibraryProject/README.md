@@ -21,13 +21,13 @@ The way to use it:<br>
 ##### Get into directory and create all the git repos needed
 ```
 >> cd SharedLibraryProject/
->> for d in $(ls);do cd $d;git init .;git add .;git commit -m "nothing";cd ../;done
+>> for d in $(ls | grep -v README);do cd $d;git init .;git add .;git commit -m "nothing";cd ../;done
 ```
 
 ##### Run the container
-the container from [here](https://github.com/amiriry/Devops/tree/main/Jenkins/containers/no-plugins-installation-local-repo) with another plugin installed named: <b>pipeline-utility-steps</b>
+the container from [here](https://github.com/amiriry/Devops/tree/main/Jenkins/containers/no-plugins-installation-local-repo) with another plugin installed named: <b>pipeline-utility-steps</b>. I named the version <b>v3</b>
 ```
-docker run --name myjenkins -td -p 8085:8080 -v $(pwd)/pipelines/:/var/pipelines -v $(pwd)/sharedLib/:/var/sharedLib -v $(pwd)/configfiles:/var/configfiles jenkins:
+docker run --name myjenkins -td -p 8085:8080 -v $(pwd)/pipelines/:/var/pipelines -v $(pwd)/sharedLib/:/var/sharedLib -v $(pwd)/configfiles:/var/configfiles jenkins:v3
 ```
 
 Define the pipelime as ```pipeline script from SCM``` and choose the path as one of your volumes, where the pipeline is ```/var/pipelines```.<br>
