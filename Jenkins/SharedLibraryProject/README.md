@@ -9,9 +9,12 @@ The way to use it:<br>
 >> cd projectdir
 ```
 
-##### Clone all the repo or only part of it with the file
+##### Clone only sharedlib dir with sparse checkout
 ```
->> echo "SharedLibraryProject/" >> .git/info/sparse-checkout
+>> git init .
+>> git remote add origin https://github.com/amiriry/Devops.git
+>> git sparse-checkout init
+>> echo "Jenkins/SharedLibraryProject/" >> .git/info/sparse-checkout
 >> git pull origin master
 ```
 
