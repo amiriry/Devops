@@ -55,6 +55,7 @@ pipeline-stage-tags-metadata
 pipeline-stage-view
 plain-credentials
 plugin-util-api
+pipeline-utility-steps
 popper2-api
 resource-disposer
 scm-api
