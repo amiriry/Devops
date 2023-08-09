@@ -8,7 +8,7 @@ node() {
 	echo "doing basicStep:"
 	basicStep 'amir'
 	basicStep 'lilach'
-	readme 'check'
+	readme()
 	execme "nothing"
 	echo "Done loading the shared library"
 }
