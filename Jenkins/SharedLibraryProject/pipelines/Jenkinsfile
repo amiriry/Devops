@@ -6,8 +6,8 @@ node() {
 			  retriever: modernSCM([$class: 'GitSCMSource', remote: "/var/sharedLib"]), 
 			  changelog: false
 	echo "doing basicStep:"
-	basicStep 'amir'
-	basicStep 'lilach'
+	basicStep 'input1'
+	basicStep 'input2'
 	readme()
 	execme()
 	echo "Done loading the shared library"
