@@ -1,4 +1,4 @@
-def call(some) {
+def call() {
 	echo "Getting into exeme"
 	config=readYaml file:'/var/configfiles/myfile.yaml'
 	echo "trying to execute the command:"

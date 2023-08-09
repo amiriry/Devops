@@ -9,6 +9,6 @@ node() {
 	basicStep 'amir'
 	basicStep 'lilach'
 	readme()
-	execme "nothing"
+	execme()
 	echo "Done loading the shared library"
 }
